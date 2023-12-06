@@ -2,38 +2,52 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.draft {
+display: grid;
+grid-gap: 10px;
+grid-template-areas: 
+"header header"
+"pick prospect"
+"pick prospect";
+grid-template-columns: 1fr 1fr;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-float infinite 3s ease-in-out;
-  }
+.prospect-panel {
+  grid-area: prospect;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: lightblue;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  margin-right: 10px;
+
 }
 
-.App-header {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.pick-panel {
+  grid-area: pick;
+  border-radius: 5px;
+  background-color: lightgreen;
+  padding: 5px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  margin-left: 10px;
 }
 
-.App-link {
-  color: rgb(112, 76, 182);
+.header-panel {
+  grid-area: header;
+  background-color: lightcoral;
 }
 
-@keyframes App-logo-float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+.prospect-table {
+  width: 100%;
+}
+
+.prospect-sort-btn {
+  margin: 0px 10px;
+}
+
+.prospect-card {
+  border-radius: 5px;
+  background-color: whitesmoke;
+  margin: 2px 20px;
+  padding: 10px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
