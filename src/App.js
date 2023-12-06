@@ -2,12 +2,11 @@ import React, {useState, useEffect} from 'react';
 import logo from './logo.svg';
 import { Counter } from './features/counter/Counter';
 import './App.css';
-import { ProspectPanel } from './features/prospect/ProspectPanel';
-import { PickPanel } from './features/pick/PickPanel';
-import {Prospect, Team, Draft} from './components.js'
+import { DraftPanels } from './features/draft/DraftPanels';
+import {Prospect, Team, Draft} from './components'
 
 function App() {
-  const [draft, setDraft] = useState(Draft([], []));
+  const [draft, setDraft] = useState([Draft([], [])]);
   let testProspect = Prospect("Alex Spors", "Wisconsin", "WR");
   let testProspect2 = Prospect("Tim Schieck", "Colorado", "TE");
   let testProspect3 = Prospect("Dan Saaman", "Vermont", "QB");
@@ -37,8 +36,7 @@ function App() {
       </div>
       {(draft.Prospects.length > 0 && draft.Teams.length > 0) && 
         <>
-          <ProspectPanel prospects={draft.Prospects} />
-          <PickPanel teams={draft.Prospects} prospects={draft.Teams} />
+          <DraftPanels teams={draft.Prospects} prospects={draft.Teams} />
         </>
       }
     </div>
