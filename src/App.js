@@ -10,23 +10,20 @@ function App() {
   let testProspect = Prospect("Alex Spors", "Wisconsin", "WR");
   let testProspect2 = Prospect("Tim Schieck", "Colorado", "TE");
   let testProspect3 = Prospect("Dan Saaman", "Vermont", "QB");
-  let testTeam = Team("Green Bay", "Packers", 20);
-  let testTeam2 = Team("Denver", "Broncos", 14);
-  let testTeam3 = Team("New England", "Patriots", 3);
+  let testTeam = Team("Green Bay", "Packers", ["1"]);
+  let testTeam2 = Team("Denver", "Broncos", ["2", "4"]);
+  let testTeam3 = Team("New England", "Patriots", ["3"]);
 
   useEffect(() => {
-    if (draft.Prospects.length === 0) {
+    if (draft.Prospects === undefined || draft.Prospects?.length === 0) {
       loadDraft();
     }
   }, [draft])
 
   function loadDraft() {
     let currentDraft = Draft([testProspect, testProspect2, testProspect3], [testTeam, testTeam2, testTeam3]);
-    console.log("loadDraft: ", currentDraft);
     setDraft(currentDraft);
   }
-
-  console.log("draft: ", draft);
 
   return (
     <div className="App draft">
@@ -34,9 +31,9 @@ function App() {
         <h1>Welcome to the 2024 NFL Draft</h1>
         <h3>The Pack are back!</h3>
       </div>
-      {(draft.Prospects.length > 0 && draft.Teams.length > 0) && 
+      {(draft.Prospects?.length > 0 && draft.Teams?.length > 0) && 
         <>
-          <DraftPanels teams={draft.Prospects} prospects={draft.Teams} />
+          <DraftPanels allTeams={draft.Teams} allProspects={draft.Prospects} />
         </>
       }
     </div>

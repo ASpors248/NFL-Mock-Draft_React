@@ -8,7 +8,7 @@ export function DraftPanels(allTeams, allProspects) {
     const [teams, setTeams] = useState(Object.values(allTeams)[0]);
 
     useEffect(() => {
-        
+        console.log("prospects: ", allProspects, " teams: ", teams);
     }, [availableProspects, teams])
     
     function selectProspect(indexOfProspect) {
@@ -17,72 +17,60 @@ export function DraftPanels(allTeams, allProspects) {
         setAvailableProspects(currentProspects);
     }
 
-    function populatePickPanel(team, indexOfTeamInArr) {
-        let hasMadePick = team.Selections === null ? false : true;
-        let hasMoreThanOnePick = team.PickNumbers.length > 1;
-        let hasFirstRoundPick = doesTeamHaveFirstRoundPick(team, hasMoreThanOnePick)
-        switch(hasMadePick) {
-            case true:
-                if (!hasMoreThanOnePick) {
-                    return (
-                        <p>`${team.PickNumbers[0]}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[0].Schoool}`</p>
-                    )
-                } else {
-                    if (indexOfTeamInArr > 0 && teams[indexOfTeamInArr - 1].Selections === null) {
-                        return (
-                            <p>`${team.PickNumbers[1]}: ${team.City} ${team.Name}</p>
-                        )
-                    } else {
-                        return (
-                            <p>`${team.PickNumbers[0]}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[0].Schoool}`</p>
-                        )
-                    }
-                }
-            case false:
-                if (!hasFirstRoundPick) {
-                    break;
-                }
-
-                if (!hasMoreThanOnePick) {
-                    return (
-                        <p>`${team.PickNumbers[0]}: ${team.City} ${team.Name}</p>
-                    )
-                } else {
-                    if (team.PickNumbers[0] === indexOfTeamInArr + 1) {
-                        return (
-                            <p>`${team.PickNumbers[0]}: ${team.City} ${team.Name}</p>
-                        )
-                    } else {
-                        return (
-                            <p>`${team.PickNumbers[1]}: ${team.City} ${team.Name}</p>
-                        )
-                    }
-                }
+    function sortAndReturnHTML() {
+        let sortedArray = [];
+        let pickNum = 1;
+        for (let i = 0; i < 33; i++) {
+            let teamHasCurrentPick = teams[i].PickNumbers?.includes(pickNum.toString());
+            if (teamHasCurrentPick === true) {
+                sortedArray.push(teams[i]);
+                pickNum++
+            } 
         }
+        console.log("sorted: ", sortedArray);
+        return populatePickPanel(sortedArray);
     }
 
-    function doesTeamHaveFirstRoundPick(team, hasMoreThanOnePick) {
-        if (hasMoreThanOnePick === false) {
-            return team.PickNumbers[0] <= 32;
-        } else {
-            return team.PickNumbers.some(num => num <= 32);
-        }
+    function populatePickPanel(sortedTeamArray) {
+        sortedTeamArray.map((team, index) => {
+            let hasMadePick = team.Selections === null ? false : true;
+            let hasMoreThanOnePick = team.PickNumbers.length > 1;
+            let pickNum = index + 1;
+
+            switch(hasMadePick) {
+                case true:
+                    if (!hasMoreThanOnePick) {
+                        return (
+                            <p>`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[0].Schoool}`</p>
+                        )
+                    } else {
+                        if (index > 0 && teams[index - 1].Selections === null) {
+                            return (
+                                <p>`${pickNum}: ${team.City} ${team.Name}</p>
+                            )
+                        } else {
+                            let indexOfPick = team.PickNumbers.indexOf(pickNum);
+                            return (
+                                <p>`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[indexOfPick].Schoool}`</p>
+                            )
+                        }
+                    }
+                case false:    
+                    return (
+                        <p>`${pickNum}: ${team.City} ${team.Name}</p>
+                    )
+            }
+        })
     }
 
     return (
     <>
         <div className="pick-panel">
-            {teams.length > 0 && 
-                teams.map((t, index) => {
-                    return (
-                        populatePickPanel(t, index)
-                    )
-                })
-            }
+            {sortAndReturnHTML()}
         </div>
         <div className="prospect-panel">
             <table className="prospect-table">
-            {availableProspects.length > 0 && 
+            {availableProspects?.length > 0 && 
                 availableProspects.map((p, index) => {
                     return (
                         <>
