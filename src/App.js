@@ -6,7 +6,7 @@ import { DraftPanels } from './features/draft/DraftPanels';
 import {Prospect, Team, Draft} from './components'
 
 function App() {
-  const [draft, setDraft] = useState([Draft([], [])]);
+  const [draft, setDraft] = useState(Draft([], []));
   let testProspect = Prospect("Alex Spors", "Wisconsin", "WR");
   let testProspect2 = Prospect("Tim Schieck", "Colorado", "TE");
   let testProspect3 = Prospect("Dan Saaman", "Vermont", "QB");
@@ -25,6 +25,7 @@ function App() {
     setDraft(currentDraft);
   }
 
+  console.log("draft: ", draft);
   return (
     <div className="App draft">
       <div className="header-panel">
@@ -33,7 +34,7 @@ function App() {
       </div>
       {(draft.Prospects?.length > 0 && draft.Teams?.length > 0) && 
         <>
-          <DraftPanels allTeams={draft.Teams} allProspects={draft.Prospects} />
+          <DraftPanels draft={draft}/>
         </>
       }
     </div>

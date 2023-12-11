@@ -2,14 +2,24 @@ import React, {useState, useEffect} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {Prospect} from '../../components.js';
 
-export function DraftPanels(allTeams, allProspects) {
-
-    const [availableProspects, setAvailableProspects] = useState(Object.values(allProspects)[0]);
-    const [teams, setTeams] = useState(Object.values(allTeams)[0]);
+export function DraftPanels(draft) {
+    const [currentDraft, setCurrentDraft] = useState(draft.draft)
+    const [availableProspects, setAvailableProspects] = useState([]);
+    const [teams, setTeams] = useState([]);
+    const [isSorted, setIsSorted] = useState(false);
 
     useEffect(() => {
-        console.log("prospects: ", allProspects, " teams: ", teams);
-    }, [availableProspects, teams])
+        if (availableProspects?.length === 0) {
+            setAvailableProspects(currentDraft.Prospects);
+        }
+        if (teams?.length === 0) {
+            setTeams(currentDraft.Teams);
+        }
+        if (isSorted === false && teams.length > 0) {
+            sortTeams();
+            setIsSorted(true);
+        }
+    }, [currentDraft, teams]);
     
     function selectProspect(indexOfProspect) {
         let currentProspects = [...availableProspects];
@@ -17,78 +27,87 @@ export function DraftPanels(allTeams, allProspects) {
         setAvailableProspects(currentProspects);
     }
 
-    function sortAndReturnHTML() {
+    function sortTeams() {
         let sortedArray = [];
-        let pickNum = 1;
-        for (let i = 0; i < 33; i++) {
-            let teamHasCurrentPick = teams[i].PickNumbers?.includes(pickNum.toString());
-            if (teamHasCurrentPick === true) {
-                sortedArray.push(teams[i]);
-                pickNum++
-            } 
+        for (var i = 1; i < 5; i++) {
+            let pickNum = i;
+            for (var n = 0; n < teams.length; n++) {
+                let teamHasCurrentPick = teams[n]?.PickNumbers?.includes(pickNum.toString());
+
+                if (teamHasCurrentPick === true) {
+                    sortedArray.push(teams[n]);
+                    break;
+                } 
+            }
         }
-        console.log("sorted: ", sortedArray);
-        return populatePickPanel(sortedArray);
+        setTeams(sortedArray);
     }
 
-    function populatePickPanel(sortedTeamArray) {
-        sortedTeamArray.map((team, index) => {
-            let hasMadePick = team.Selections === null ? false : true;
-            let hasMoreThanOnePick = team.PickNumbers.length > 1;
-            let pickNum = index + 1;
+    function populatePickPanel(team, index) {
+        let hasMadePick = team.Selections === null ? false : true;
+        let hasMoreThanOnePick = team.PickNumbers.length > 1;
+        let pickNum = index + 1;
+        return (
+            determineTeamDisplay(team, index, pickNum, hasMadePick, hasMoreThanOnePick)
+        )
+    }
 
-            switch(hasMadePick) {
-                case true:
-                    if (!hasMoreThanOnePick) {
-                        return (
-                            <p>`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[0].Schoool}`</p>
-                        )
-                    } else {
-                        if (index > 0 && teams[index - 1].Selections === null) {
-                            return (
-                                <p>`${pickNum}: ${team.City} ${team.Name}</p>
-                            )
-                        } else {
-                            let indexOfPick = team.PickNumbers.indexOf(pickNum);
-                            return (
-                                <p>`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[indexOfPick].Schoool}`</p>
-                            )
-                        }
-                    }
-                case false:    
+    function determineTeamDisplay(team, index, pickNum, hasMadePick, hasMoreThanOnePick) {
+        if (hasMadePick === true) {
+            if (!hasMoreThanOnePick) {
+                return (
+                    <p>{`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[0].Schoool}`}</p>
+                )
+            } else {
+                if (index > 0 && teams[index - 1].Selections === null) {
                     return (
-                        <p>`${pickNum}: ${team.City} ${team.Name}</p>
+                        <p>{`${pickNum}: ${team.City} ${team.Name}`}</p>
                     )
+                } else {
+                    let indexOfPick = team.PickNumbers.indexOf(pickNum);
+                    return (
+                        <p>{`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[indexOfPick].Schoool}`}</p>
+                    )
+                }
             }
-        })
+        } else {
+            return (
+                <p>{`${pickNum}: ${team.City} ${team.Name}`}</p>
+            )
+        }
     }
 
     return (
     <>
         <div className="pick-panel">
-            {sortAndReturnHTML()}
-        </div>
-        <div className="prospect-panel">
-            <table className="prospect-table">
-            {availableProspects?.length > 0 && 
-                availableProspects.map((p, index) => {
+            {teams.length > 0 && 
+                teams.map((team, index) => {
                     return (
-                        <>
-                            {p.isAvailable === true &&
-                                <tr key={index}>
-                                    <div className="prospect-card">
-                                        <p>{p.Position}</p>
-                                        <p>{p.Name}</p>
-                                        <p>{p.School}</p>
-                                        <input type="button" aria-label={`Select ${p.Position}, ${p.Name}`} value="Select Player" onClick={() => selectProspect(index)}/>
-                                    </div>
-                                </tr>   
-                            }
-                        </>
+                        populatePickPanel(team, index)
                     )
                 })
             }
-            </table>
+        </div>
+        <div className="prospect-panel">
+                {availableProspects?.length > 0 && 
+                availableProspects.map((p, index) => {
+                    return (
+                        <React.Fragment key={index}>
+                            {p?.isAvailable === true &&
+                                <div className="prospect-card">
+                                    <div className="prospect-info">
+                                        <p>{`${p.Name}, ${p.Position}`}</p>
+                                        <p>{p.School}</p>
+                                    </div>
+                                    <div className="prospect-select">
+                                        <input type="button" aria-label={`Select ${p.Position}, ${p.Name}`} value="Draft Player" onClick={() => selectProspect(index)} />
+                                    </div>    
+                                </div>
+                            }
+                        </React.Fragment>
+                    )
+                })
+            }
         </div>
     </>
     );
