@@ -7,6 +7,7 @@ export function DraftPanels(draft) {
     const [availableProspects, setAvailableProspects] = useState([]);
     const [teams, setTeams] = useState([]);
     const [isSorted, setIsSorted] = useState(false);
+    const [isOnTheClock, setIsOnTheClock] = useState({});
 
     useEffect(() => {
         if (availableProspects?.length === 0) {
@@ -14,17 +15,31 @@ export function DraftPanels(draft) {
         }
         if (teams?.length === 0) {
             setTeams(currentDraft.Teams);
+            setIsOnTheClock(currentDraft.Teams[0]);
         }
         if (isSorted === false && teams.length > 0) {
             sortTeams();
             setIsSorted(true);
         }
-    }, [currentDraft, teams]);
+    }, [currentDraft, teams, availableProspects, isOnTheClock]);
     
     function selectProspect(indexOfProspect) {
         let currentProspects = [...availableProspects];
+        currentProspects[indexOfProspect].isAvailable = false;
+        let currentTeams = [...teams];
+        let indexOfOnTheClockTeam = currentTeams.indexOf(isOnTheClock);
+        let currentTeam = isOnTheClock;
+        if (currentTeam.Selections === null) {
+            currentTeam.Selections = new Array();
+            currentTeam.Selections.push(currentProspects[indexOfProspect]);
+        } else {
+            currentTeam.Selections.push(currentProspects[indexOfProspect]);
+        }
+        currentTeams[indexOfOnTheClockTeam] = currentTeam;
+        setTeams(currentTeams);
         currentProspects.splice(indexOfProspect, 1);
         setAvailableProspects(currentProspects);
+        setIsOnTheClock(teams[indexOfOnTheClockTeam + 1]);
     }
 
     function sortTeams() {
@@ -44,19 +59,21 @@ export function DraftPanels(draft) {
     }
 
     function populatePickPanel(team, index) {
+        console.log("here");
         let hasMadePick = team.Selections === null ? false : true;
         let hasMoreThanOnePick = team.PickNumbers.length > 1;
         let pickNum = index + 1;
         return (
-            determineTeamDisplay(team, index, pickNum, hasMadePick, hasMoreThanOnePick)
+            formatTeamDisplay(team, index, pickNum, hasMadePick, hasMoreThanOnePick)
         )
     }
 
-    function determineTeamDisplay(team, index, pickNum, hasMadePick, hasMoreThanOnePick) {
+    function formatTeamDisplay(team, index, pickNum, hasMadePick, hasMoreThanOnePick) {
+        console.log("has more than one: ", hasMoreThanOnePick, team);
         if (hasMadePick === true) {
-            if (!hasMoreThanOnePick) {
+            if (hasMoreThanOnePick === false) {
                 return (
-                    <p>{`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[0].Schoool}`}</p>
+                    <p>{`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[0].School}`}</p>
                 )
             } else {
                 if (index > 0 && teams[index - 1].Selections === null) {
@@ -64,9 +81,11 @@ export function DraftPanels(draft) {
                         <p>{`${pickNum}: ${team.City} ${team.Name}`}</p>
                     )
                 } else {
-                    let indexOfPick = team.PickNumbers.indexOf(pickNum);
+                    let indexOfPick = team.PickNumbers.indexOf(pickNum.toString());
+                    console.log("pickNum: ", pickNum);
+                    console.log("indexOfPick: ", indexOfPick);
                     return (
-                        <p>{`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[indexOfPick].Schoool}`}</p>
+                        <p>{`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[indexOfPick].School}`}</p>
                     )
                 }
             }
@@ -76,12 +95,14 @@ export function DraftPanels(draft) {
             )
         }
     }
-
+    console.log(teams);
+    console.log(isOnTheClock);
     return (
     <>
         <div className="pick-panel">
             {teams.length > 0 && 
                 teams.map((team, index) => {
+                    console.log("firstMap");
                     return (
                         populatePickPanel(team, index)
                     )

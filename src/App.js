@@ -10,6 +10,7 @@ function App() {
   let testProspect = Prospect("Alex Spors", "Wisconsin", "WR");
   let testProspect2 = Prospect("Tim Schieck", "Colorado", "TE");
   let testProspect3 = Prospect("Dan Saaman", "Vermont", "QB");
+  let testProspect4 = Prospect("Chad Springetti", "Arizona", "K");
   let testTeam = Team("Green Bay", "Packers", ["1"]);
   let testTeam2 = Team("Denver", "Broncos", ["2", "4"]);
   let testTeam3 = Team("New England", "Patriots", ["3"]);
@@ -21,11 +22,10 @@ function App() {
   }, [draft])
 
   function loadDraft() {
-    let currentDraft = Draft([testProspect, testProspect2, testProspect3], [testTeam, testTeam2, testTeam3]);
+    let currentDraft = Draft([testProspect, testProspect2, testProspect3, testProspect4], [testTeam, testTeam2, testTeam3]);
     setDraft(currentDraft);
   }
 
-  console.log("draft: ", draft);
   return (
     <div className="App draft">
       <div className="header-panel">
