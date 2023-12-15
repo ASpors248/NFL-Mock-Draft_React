@@ -3,25 +3,25 @@ import { useSelector, useDispatch } from 'react-redux';
 import {Prospect} from '../../components.js';
 
 export function DraftPanels(draft) {
-    const [currentDraft, setCurrentDraft] = useState(draft.draft)
+    const [currentDraft, setCurrentDraft] = useState({})
     const [availableProspects, setAvailableProspects] = useState([]);
     const [teams, setTeams] = useState([]);
     const [isSorted, setIsSorted] = useState(false);
     const [teamOnTheClock, setTeamOnTheClock] = useState({});
 
     useEffect(() => {
-        if (availableProspects?.length === 0) {
-            setAvailableProspects(currentDraft.Prospects);
+        if (currentDraft.Teams === undefined) {
+            setCurrentDraft(draft.draft);
+            setAvailableProspects(draft.draft.Prospects);
+            setTeams(draft.draft.Teams);
+            setTeamOnTheClock(draft.draft.Teams[0]);
         }
-        if (teams?.length === 0) {
-            setTeams(currentDraft.Teams);
-            setTeamOnTheClock(currentDraft.Teams[0]);
-        }
+
         if (isSorted === false && teams.length > 0) {
             sortTeams();
             setIsSorted(true);
         }
-    }, [currentDraft, teams, availableProspects, teamOnTheClock]);
+    }, [teams]);
     
     function selectProspect(indexOfProspect) {
         let currentProspects = [...availableProspects];
@@ -82,22 +82,22 @@ export function DraftPanels(draft) {
         if (hasMadePick === true) {
             if (hasMoreThanOnePick === false) {
                 return (
-                    <p>{`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[0].School}`}</p>
+                    <p key={pickNum}>{`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[0].Name}, ${team.Selections[0].Position} - ${team.Selections[0].School}`}</p>
                 )
             } else {
                 if (team.Selections[indexOfPick] === undefined) {
                     return (
-                        <p>{`${pickNum}: ${team.City} ${team.Name}`}</p>
+                        <p key={pickNum}>{`${pickNum}: ${team.City} ${team.Name}`}</p>
                     )
                 } else {
                     return (
-                        <p>{`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[indexOfPick].Name}, ${team.Selections[indexOfPick].Position} - ${team.Selections[indexOfPick].School}`}</p>
+                        <p key={pickNum}>{`${pickNum}: ${team.City} ${team.Name}: ${team.Selections[indexOfPick].Name}, ${team.Selections[indexOfPick].Position} - ${team.Selections[indexOfPick].School}`}</p>
                     )
                 }
             }
         } else {
             return (
-                <p>{`${pickNum}: ${team.City} ${team.Name}`}</p>
+                <p key={pickNum}>{`${pickNum}: ${team.City} ${team.Name}`}</p>
             )
         }
     }
